@@ -79,7 +79,8 @@ enum BLOCKSTATE
   ST_EXT_W2,
   ST_EMPTY,
 };
-BLOCKSTATE CrossingState;
+BLOCKSTATE CrossingStateT1; //This variable used for Track 1
+BLOCKSTATE CrossingStateT2; //This variable used for Track 2
 
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 // and Setup variables
@@ -111,7 +112,7 @@ void setup()
   pinMode(SensorW1In,   INPUT_PULLUP);
   pinMode(SensorW2In,   INPUT_PULLUP);
 
-  CrossingState = ST_EMPTY; //Set CrossingState to Empty
+  CrossingStateT1 = ST_EMPTY; //Set CrossingState to Empty
 }
 
 void loop() 
@@ -128,7 +129,7 @@ void loop()
   //SensorW2 = digitalRead(SensorW2In);
 
 
-  switch (CrossingState) //Switch used as a Multiple If Stmt set
+  switch (CrossingStateT1) //Switch used as a Multiple If Stmt set
   {
     case ST_EMPTY:
       CrossingEmpty(SensorE1,SensorE2,SensorW1,SensorW2);
@@ -163,7 +164,7 @@ void loop()
   }
   
   // Tell the user the status of the sensors on the OLED
-  BlockingSensorStatus(SensorE1,SensorE2,SensorW1,SensorW2,CrossingState);
+  BlockingSensorStatus(SensorE1,SensorE2,SensorW1,SensorW2,CrossingStateT1);
 }
 
 /***************************************************************************
@@ -181,12 +182,12 @@ void CrossingEmpty(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorE1 == LOW) //When front of train hits SensorE1
   {
     // change state to ENT_E1
-    CrossingState = ST_ENT_E1;
+    CrossingStateT1 = ST_ENT_E1;
   }
   else if(SensorW1 == LOW) //When front of train hits SensorW1
   {
     // change state to ENT_W1
-    CrossingState = ST_ENT_W1;
+    CrossingStateT1 = ST_ENT_W1;
   }
 }
 
@@ -198,12 +199,12 @@ void CrossingENT_E1(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorE1 == LOW && SensorE2 == LOW) //When train Covers both SensorE1 and SensorE2
   {
     // change state to Ent_E2
-    CrossingState = ST_ENT_E2;
+    CrossingStateT1 = ST_ENT_E2;
   }
   else if(SensorE1 == HIGH && SensorE2 == HIGH) //If train backs up and clears SensorE1 
   {
     // change state to Empty
-    CrossingState = ST_EMPTY;
+    CrossingStateT1 = ST_EMPTY;
   }
 }
 
@@ -215,12 +216,12 @@ void CrossingENT_E2(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorE1 == HIGH && SensorE2 == LOW) //When end of train clears SensorE1 and Still on SensorE2
   {
     // change state to Occupied
-    CrossingState = ST_OCCUPIED;
+    CrossingStateT1 = ST_OCCUPIED;
   }
   else if(SensorE1 == LOW && SensorE2 == HIGH) //If train backs up and clears SensorE2 but still on SensorE1
   {
     // change state to EXT_E1
-    CrossingState = ST_EXT_E1;
+    CrossingStateT1 = ST_EXT_E1;
   }
 }
 
@@ -232,12 +233,12 @@ void CrossingENT_W1(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorW1 == LOW && SensorW2 == LOW) //When Train covers SensorW1 and SensorW2
   {
     // change state to Ent_W2
-    CrossingState = ST_ENT_W2;
+    CrossingStateT1 = ST_ENT_W2;
   }
   else if(SensorW1 == HIGH && SensorW2 == HIGH) //If trains backs up and clears SensorW1
   {
     // change state to Empty
-    CrossingState = ST_EMPTY;
+    CrossingStateT1 = ST_EMPTY;
   }
 }
 
@@ -249,12 +250,12 @@ void CrossingENT_W2(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorW1 == HIGH && SensorW2 == LOW) //When end of train clears SensorW1 and Still on SensorW2
   {
     // change state to Occupied
-    CrossingState = ST_OCCUPIED;
+    CrossingStateT1 = ST_OCCUPIED;
   }
   else if(SensorW1 == LOW && SensorW2 == HIGH) //if train backs up and clears SensorE2 but still on SensorW1
   {
     // change state to EXT_W1
-    CrossingState = ST_EXT_W1;
+    CrossingStateT1 = ST_EXT_W1;
   }
 }
 
@@ -266,12 +267,12 @@ void CrossingOccupied(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorE2 == LOW) //When front of train hits sensorE2
   {
     // change state to EXT_E2
-    CrossingState = ST_EXT_E2;
+    CrossingStateT1 = ST_EXT_E2;
   }
   else if(SensorW2 == LOW) //When fornt of train hits second sensorW2
   {
     // change state to EXT_W2
-    CrossingState = ST_EXT_W2;
+    CrossingStateT1 = ST_EXT_W2;
   }
 }
 
@@ -283,12 +284,12 @@ void CrossingExt_E1(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorE1 == HIGH && SensorE2 == HIGH) //When end of train clears SensorE1
   {
     // change state to Empty
-    CrossingState = ST_EMPTY;
+    CrossingStateT1 = ST_EMPTY;
   }
   else if(SensorE1 == HIGH && SensorE2 == LOW) // to account for a direction change
   {
     //Change State to Ext_E2
-    CrossingState = ST_EXT_E2;
+    CrossingStateT1 = ST_EXT_E2;
   }
 }
 
@@ -300,11 +301,11 @@ void CrossingExt_E2(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorE1 == LOW && SensorE2 == LOW) //When Train covers both Sensors Leaving the Block
   {
     // change state to Ext_E1
-    CrossingState = ST_EXT_E1;
+    CrossingStateT1 = ST_EXT_E1;
   }
   else if(SensorE1 == HIGH && SensorE2 == HIGH) //to account for direction change
     // Change state to Occupied
-    CrossingState = ST_OCCUPIED;
+    CrossingStateT1 = ST_OCCUPIED;
 }
 
 void CrossingExt_W1(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
@@ -315,12 +316,12 @@ void CrossingExt_W1(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorW1 == HIGH && SensorW2 == HIGH) //When end of train clears SensorW1
   {
     // change state to Empty
-    CrossingState = ST_EMPTY;
+    CrossingStateT1 = ST_EMPTY;
   }
   else if(SensorW1 == HIGH && SensorW2 ==LOW) //to account for a direction change
   {
     // Change state to EXT_W2
-    CrossingState = ST_EXT_W2;
+    CrossingStateT1 = ST_EXT_W2;
   }
 }
 
@@ -332,12 +333,12 @@ void CrossingExt_W2(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
   if(SensorW1 == LOW && SensorW2 == LOW) //When end of train clears SensorE2
   {
     // change state to EXT_W1
-    CrossingState = ST_EXT_W1;
+    CrossingStateT1 = ST_EXT_W1;
   }
   else if(SensorW1 == HIGH && SensorW2 == HIGH) //to account for direction change
   {
     // Change state to Occupied
-    CrossingState = ST_OCCUPIED;
+    CrossingStateT1 = ST_OCCUPIED;
     }
 }
 
