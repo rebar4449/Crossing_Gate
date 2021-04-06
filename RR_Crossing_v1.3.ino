@@ -48,11 +48,11 @@ DrDuino_Explorer Explorer;
 Adafruit_NeoPixel strip(Explorer.NumOfLEDS, Explorer.AddressLED_Pin, NEO_GRB + NEO_KHZ800);
 
 // General Variable Definitions 
-int SensorE1 = LOW;         // variable for reading the pushbutton status
-int SensorE2 = LOW;         // variable for reading the pushbutton status
-int SensorW1 = LOW;         // variable for reading the pushbutton status
-int SensorW2 = LOW;         // variable for reading the pushbutton status
-int TrainInBlock = LOW;       // variable for if there is a train in the block, LOW(UnBlocked) HIGH(BLOCKED)
+int SensorT1E1 = LOW;         // variable for reading the pushbutton status
+int SensorT1E2 = LOW;         // variable for reading the pushbutton status
+int SensorT1W1 = LOW;         // variable for reading the pushbutton status
+int SensorT1W2 = LOW;         // variable for reading the pushbutton status
+int TrainInBlockT1 = LOW;       // variable for if there is a train in the block, LOW(UnBlocked) HIGH(BLOCKED)
 
 //Variables for CrossingLED
 unsigned long previousMillis = 0; //for CrossingLED Function, Global so it doesn't lose number
@@ -60,10 +60,10 @@ int ToggleFlashPattern = 0; //used to alternate the LEDs in the CrossingLED Func
 int RRCrossingDelay   = 800; // 1000 = 1 second. 
 
 //Set pins for Sensors
-const int  SensorE1In   = 2;
-const int  SensorE2In   = 3;
-const int  SensorW1In   = 4;
-const int  SensorW2In   = 5;
+const int  SensorT1E1In   = 2;
+const int  SensorT1E2In   = 3;
+const int  SensorT1W1In   = 4;
+const int  SensorT1W2In   = 5;
 
 //Create a special variable for State of the Block
 enum BLOCKSTATE
@@ -107,10 +107,10 @@ void setup()
   strip.show();  // Initialize all pixels to 'off'
   strip.setBrightness(42); // Set BRIGHTNESS to about 1/6 (max = 255)
   
-  pinMode(SensorE1In,   INPUT_PULLUP);
-  pinMode(SensorE2In,   INPUT_PULLUP);
-  pinMode(SensorW1In,   INPUT_PULLUP);
-  pinMode(SensorW2In,   INPUT_PULLUP);
+  pinMode(SensorT1E1In,   INPUT_PULLUP);
+  pinMode(SensorT1E2In,   INPUT_PULLUP);
+  pinMode(SensorT1W1In,   INPUT_PULLUP);
+  pinMode(SensorT1W2In,   INPUT_PULLUP);
 
   CrossingStateT1 = ST_EMPTY; //Set CrossingState to Empty
 }
@@ -118,53 +118,53 @@ void setup()
 void loop() 
 {
    //Below Should commented out once we are using sensor
-  SensorE1 = digitalRead(Explorer.SW1);
-  SensorE2 = digitalRead(Explorer.SW2);
-  SensorW2 = digitalRead(Explorer.SW3);
-  SensorW1 = digitalRead(Explorer.SW4);
+  SensorT1E1 = digitalRead(Explorer.SW1);
+  SensorT1E2 = digitalRead(Explorer.SW2);
+  SensorT1W2 = digitalRead(Explorer.SW3);
+  SensorT1W1 = digitalRead(Explorer.SW4);
 
-  //SensorE1 = digitalRead(SensorE1In);
-  //SensorE2 = digitalRead(SensorE2In);
-  //SensorW1 = digitalRead(SensorW1In);
-  //SensorW2 = digitalRead(SensorW2In);
+  //SensorT1E1 = digitalRead(SensorE1In);
+  //SensorT1E2 = digitalRead(SensorE2In);
+  //SensorT1W1 = digitalRead(SensorW1In);
+  //SensorT1W2 = digitalRead(SensorW2In);
 
 
   switch (CrossingStateT1) //Switch used as a Multiple If Stmt set
   {
     case ST_EMPTY:
-      CrossingEmpty(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingEmpty(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_ENT_E1:
-      CrossingENT_E1(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingENT_E1(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_ENT_E2:
-      CrossingENT_E2(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingENT_E2(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_ENT_W1:
-      CrossingENT_W1(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingENT_W1(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_ENT_W2:
-      CrossingENT_W2(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingENT_W2(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_OCCUPIED:
-      CrossingOccupied(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingOccupied(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_EXT_E1:
-      CrossingExt_E1(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingExt_E1(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_EXT_E2:
-      CrossingExt_E2(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingExt_E2(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_EXT_W1:
-      CrossingExt_W1(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingExt_W1(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
     case ST_EXT_W2:
-      CrossingExt_W2(SensorE1,SensorE2,SensorW1,SensorW2);
+      CrossingExt_W2(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2);
       break;
   }
   
   // Tell the user the status of the sensors on the OLED
-  BlockingSensorStatus(SensorE1,SensorE2,SensorW1,SensorW2,CrossingStateT1);
+  BlockingSensorT1Status(SensorT1E1,SensorT1E2,SensorT1W1,SensorT1W2,CrossingStateT1);
 }
 
 /***************************************************************************
@@ -174,7 +174,7 @@ void loop()
 *                              USAGE
 *  Crossing______(SensorE1,SensorE2,SensorW1,SensorW2);
 ***************************************************************************/
-void CrossingEmpty(int SensorE1, int SensorE2, int SensorW1, int SensorW2)
+void CrossingEmpty(int SensorT1E1, int SensorE2, int SensorW1, int SensorW2)
 {
   //Do this:
   CrossingLED(LOW); //Turn off Crossing Lights
